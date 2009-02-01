@@ -1,9 +1,15 @@
-all:
-	./compiler.rb > code.s
-	gcc -o code code.s
-
 run: all
-	./code
+	./step8
+
+all: step8
+
+step8: step8.o runtime.o
+
+step8.o: step8.s
+
+step8.s: compiler.rb
+	ruby compiler.rb >step8.s
 
 clean:
-	rm code*
+	rm -f *~ *.o *.s step8
+
