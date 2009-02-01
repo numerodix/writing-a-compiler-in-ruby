@@ -1,14 +1,49 @@
-#!/usr/bin/env ruby
-#
-# Writing a compiler in Ruby bottom up - step 1
-# http://www.hokstad.com/writing-a-compiler-in-ruby-bottom-up-step-1.html
+#!/bin/env ruby
+
+# Step 2
 
 class Compiler
+  def initialize
+    @string_constants = {}
+    @seq = 0
+  end
+
+  def get_arg(a)
+    # For now we assume strings only
+    seq = @string_constants[a]
+    return seq if seq
+    seq = @seq
+    @seq += 1
+    @string_constants[a] = seq
+    return seq
+  end
+
+  def output_constants
+    puts "\t.section\t.rodata"
+    @string_constants.each do |c,seq|
+      puts ".LC#{seq}:"
+      puts "\t.string \"#{c}\""
+    end
+  end
+
+  def compile_exp(exp)
+    call = exp[0].to_s
+
+    args = exp[1..-1].collect {|a| get_arg(a)} 
+    
+    puts "\tsubl\t$4,%esp"
+
+    args.each do |a|
+      puts "\tmovl\t$.LC#{a},(%esp)"
+    end
+
+    puts "\tcall\t#{call}"
+	puts "\taddl\t$4, %esp"
+  end
 
   def compile(exp)
     # Taken from gcc -S output
     puts <<PROLOG
-	.file	"bootstrap.rb"
 	.text
 .globl main
 	.type	main, @function
@@ -21,16 +56,18 @@ main:
 	pushl	%ecx
 PROLOG
 
+    compile_exp(exp)
+
     puts <<EPILOG
 	popl	%ecx
 	popl	%ebp
 	leal	-4(%ecx), %esp
 	ret
+	.size	main, .-main
 EPILOG
 
-    puts <<GLOBAL_EPILOG
-	.size	main, .-main
-GLOBAL_EPILOG
+    output_constants
+
   end
 end
 
