@@ -3,11 +3,19 @@
 # Writing a compiler in Ruby bottom up - step 3
 # http://www.hokstad.com/writing-a-compiler-in-ruby-bottom-up---step-3.html
 
+DO_BEFORE= [:do,
+  [:defun, :hello_world,[], [:puts, "Hello World"]]
+]
+
+DO_AFTER= []
+
+
 class Compiler
   PTR_SIZE=4
 
   def initialize
     @string_constants = {}
+    @global_functions = {}
     @seq = 0
   end
 
@@ -34,11 +42,34 @@ class Compiler
     end
   end
 
+ def output_functions
+    @global_functions.each do |name,data|
+     puts ".globl #{name}"
+     puts ".type   #{name}, @function"
+     puts "#{name}:"
+      puts "\tpushl   %ebp"
+      puts "\tmovl    %esp, %ebp"
+      compile_exp(data[1])
+      puts "\tleave"
+      puts "\tret"
+     puts "\t.size   #{name}, .-#{name}"
+      puts
+    end
+  end
+
+  def defun name, args, body
+    @global_functions[name] = [args,body]
+  end
+
   def compile_exp(exp)
+    return if !exp || exp.size == 0
+
     if exp[0] == :do 
       exp[1..-1].each { |e| compile_exp(e) } 
       return 
     end 
+
+    return defun(*exp[1..-1]) if (exp[0] == :defun)
 
     call = exp[0].to_s
 
@@ -62,7 +93,7 @@ class Compiler
     puts "\taddl\t$#{stack_adjustment}, %esp"
   end
 
-  def compile(exp)
+  def compile_main(exp)
     # Taken from gcc -S output
     puts <<PROLOG
 	.text
@@ -87,11 +118,15 @@ PROLOG
 	.size	main, .-main
 EPILOG
 
+    output_functions
     output_constants
-
   end
+
+  def compile(exp) 
+    compile_main([:do, DO_BEFORE, exp, DO_AFTER]) 
+  end  
 end
 
-prog = [:printf,"'hello world' takes %ld bytes\\n",[:strlen, "hello world"]]
+prog = [:hello_world]
 
 Compiler.new.compile(prog)
