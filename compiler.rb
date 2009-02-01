@@ -3,9 +3,7 @@
 # Writing a compiler in Ruby bottom up - step 4
 # http://www.hokstad.com/writing-a-compiler-in-ruby-bottom-up-step-4.html
 
-DO_BEFORE= [:do,
-  [:defun, :hello_world,[], [:puts, "Hello World"]]
-]
+DO_BEFORE= []
 
 DO_AFTER= []
 
@@ -25,6 +23,8 @@ class Compiler
       compile_exp(a) 
       return [:subexpr] 
      end 
+
+    return [:int, a] if (a.is_a?(Fixnum)) 
 
     seq = @string_constants[a]
     return seq if seq
@@ -61,6 +61,20 @@ class Compiler
     @global_functions[name] = [args,body]
   end
 
+  def ifelse cond, if_arm,else_arm 
+    compile_exp(cond) 
+     puts "\ttestl   %eax, %eax" 
+     @seq += 2 
+     else_arm_seq = @seq - 1 
+     end_if_arm_seq = @seq 
+    puts "\tje  .L#{else_arm_seq}" 
+     compile_exp(if_arm) 
+    puts "\tjmp .L#{end_if_arm_seq}" 
+    puts ".L#{else_arm_seq}:" 
+     compile_exp(else_arm) 
+    puts ".L#{end_if_arm_seq}:" 
+  end 
+
   def compile_exp(exp)
     return if !exp || exp.size == 0
 
@@ -70,6 +84,7 @@ class Compiler
     end 
 
     return defun(*exp[1..-1]) if (exp[0] == :defun)
+    return ifelse(*exp[1..-1]) if (exp[0] == :if) 
 
     call = exp[0].to_s
 
@@ -82,6 +97,7 @@ class Compiler
       if exp[0] != :do
         if atype == :strconst
           param = "$.LC#{aparam}"
+        elsif atype == :int then param = "$#{aparam}" 
         else
           param = "%eax"
         end
@@ -127,6 +143,15 @@ EPILOG
   end  
 end
 
-prog = [:hello_world]
+prog = [:do,
+  [:if, [:strlen,""], 
+    [:puts, "IF: The string was not empty"], 
+    [:puts, "ELSE: The string was empty"] 
+  ], 
+  [:if, [:strlen,"Test"], 
+    [:puts, "Second IF: The string was not empty"], 
+    [:puts, "Second IF: The string was empty"] 
+  ]
+]
 
 Compiler.new.compile(prog)
