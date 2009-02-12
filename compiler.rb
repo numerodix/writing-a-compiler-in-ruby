@@ -40,8 +40,9 @@ class Function
   def rest?; @rest; end
   def get_arg(a)
     if a == :numargs
-      return [:int,args.size] if !rest?
-      return [:numargs]
+      # This is a bit of a hack, but it turns :numargs
+      # into a constant for any non-variadic function
+      return rest? ? [:lvar,-1],[:int,args.size]
     end
 
     args.each_with_index do |arg,i|
@@ -149,8 +150,6 @@ class Compiler
     return aparam if atype == :int
     return @e.addr_value(aparam) if atype == :strconst
     case atype
-    when :numargs
-      @e.movl("-4(%ebp)",@e.result_value)
     when :argaddr:
         @e.load_arg_address(aparam)
     when :addr
