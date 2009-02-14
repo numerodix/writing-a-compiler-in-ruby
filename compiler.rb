@@ -4,6 +4,7 @@
 # http://www.hokstad.com/writing-a-compiler-in-ruby-bottom-up-step-14.html
 
 require 'emitter'
+require 'sexp'
 
 DO_BEFORE= [ 
   [:defun, :array, [:size],[:malloc,[:mul,:size,4]]]
@@ -262,3 +263,19 @@ class Compiler
   end  
 end
 
+s = Scanner.new(STDIN)
+prog = nil
+
+begin
+  prog = SEXParser.new(s).parse
+rescue Exception => e
+  STDERR.puts "#{e.message}"
+  STDERR.puts "Failed before:\n"
+  buf = ""
+  while s.peek && buf.size < 100
+    buf += s.get
+  end
+  STDERR.puts buf
+end
+
+Compiler.new.compile(prog) if prog
