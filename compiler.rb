@@ -1,4 +1,7 @@
-#!/bin/env ruby
+#!/usr/bin/env ruby
+#
+# Writing a compiler in Ruby bottom up - step 3
+# http://www.hokstad.com/writing-a-compiler-in-ruby-bottom-up---step-3.html
 
 class Compiler
   PTR_SIZE=4
