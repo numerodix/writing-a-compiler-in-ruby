@@ -1,7 +1,7 @@
 #!/usr/bin/env ruby
 #
-# Writing a compiler in Ruby bottom up - step 3
-# http://www.hokstad.com/writing-a-compiler-in-ruby-bottom-up---step-3.html
+# Writing a compiler in Ruby bottom up - step 4
+# http://www.hokstad.com/writing-a-compiler-in-ruby-bottom-up-step-4.html
 
 DO_BEFORE= [:do,
   [:defun, :hello_world,[], [:puts, "Hello World"]]
