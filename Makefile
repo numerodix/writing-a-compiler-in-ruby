@@ -1,6 +1,6 @@
 run:
-	make testarray
-	-./testarray
+	make testargs
+	-./testargs
 
 all: parser
 

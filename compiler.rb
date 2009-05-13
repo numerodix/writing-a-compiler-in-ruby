@@ -1,7 +1,7 @@
 #!/usr/bin/env ruby
 #
-# Writing a compiler in Ruby bottom up - step 13
-# http://www.hokstad.com/writing-a-compiler-in-ruby-bottom-up-step-13.html
+# Writing a compiler in Ruby bottom up - step 14
+# http://www.hokstad.com/writing-a-compiler-in-ruby-bottom-up-step-14.html
 
 require 'emitter'
 
