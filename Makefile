@@ -1,5 +1,9 @@
-run: all
-	./step9
+run:
+	make parser
+	-./parser < parser.l > parser2.rb
+	make parser2
+	-./parser2 < parser.l > parser3.rb
+	diff -B parser2.rb parser3.rb
 
 all: parser
 
@@ -19,6 +23,6 @@ parser2.s: parser2.rb
 	ruby parser2.rb >parser2.s
 
 clean:
-	rm -f *~ *.o *.s parser parser2
+	rm -f *~ *.o *.s parser parser2* parser3*
 
 
