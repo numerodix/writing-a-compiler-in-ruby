@@ -1,9 +1,6 @@
 run:
-	make parser
-	-./parser < parser.l > parser2.rb
-	make parser2
-	-./parser2 < parser.l > parser3.rb
-	diff -B parser2.rb parser3.rb
+	make testarray
+	-./testarray
 
 all: parser
 
@@ -26,7 +23,7 @@ parser2.rb: parser.l parser
 	@./parser <parser.l >parser2.rb
 
 clean:
-	@rm -f *~ *.o *.s parser parser2
+	@rm -f *~ *.o *.s parser parser2 testarray
 
 testarray.s: testarray.rb
 	ruby testarray.rb >testarray.s
