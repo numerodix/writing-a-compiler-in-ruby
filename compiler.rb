@@ -1,7 +1,7 @@
 #!/usr/bin/env ruby
 #
-# Writing a compiler in Ruby bottom up - step 7
-# http://www.hokstad.com/writing-a-compiler-in-ruby-bottom-up-step-7.html
+# Writing a compiler in Ruby bottom up - step 8
+# http://www.hokstad.com/writing-a-compiler-in-ruby-bottom-up-step-8.html
 
 DO_BEFORE= []
 DO_AFTER= []
