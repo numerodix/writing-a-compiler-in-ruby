@@ -1,5 +1,5 @@
 run: all
-	./step8
+	./step9
 
 all: step9
 
